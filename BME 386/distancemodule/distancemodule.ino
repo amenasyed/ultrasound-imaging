@@ -14,7 +14,7 @@ Some code and wiring inspired by http://en.wikiversity.org/wiki/User:Dstaub/robo
 #define echoPin 12
 #define led 11
 #define led2 10
-#define outsideRange 0
+#define outsideRange 1000
 
 void setup() {
   Serial.begin (9600);
