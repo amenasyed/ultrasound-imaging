@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import numpy as np
-# import time
 import serial
 
 arduino = serial.Serial("COM6",timeout=1, baudrate=9600)
