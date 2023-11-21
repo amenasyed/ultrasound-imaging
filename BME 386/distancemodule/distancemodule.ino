@@ -9,46 +9,86 @@ More info at: http://goo.gl/kJ8Gl
 Original code improvements to the Ping sketch sourced from Trollmaker.com
 Some code and wiring inspired by http://en.wikiversity.org/wiki/User:Dstaub/robotcar
 */
+#include <TinyStepper_28BYJ_48.h>
 
 #define trigPin 13
 #define echoPin 12
 #define led 11
 #define led2 10
 #define outsideRange 1000
+const int MOTOR_IN1_PIN = 2;
+const int MOTOR_IN2_PIN = 3;
+const int MOTOR_IN3_PIN = 4;
+const int MOTOR_IN4_PIN = 5;
+const int STEPS_PER_REVOLUTION = 2048;
+TinyStepper_28BYJ_48 stepper;
+int angle = -200;
+
 
 void setup() {
-  Serial.begin (9600);
+  Serial.begin(9600);
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
   pinMode(led, OUTPUT);
   pinMode(led2, OUTPUT);
+
+  // connect and configure the stepper motor to its IO pins
+  stepper.connectToPins(MOTOR_IN1_PIN, MOTOR_IN2_PIN, MOTOR_IN3_PIN, MOTOR_IN4_PIN);
+
+  stepper.setSpeedInStepsPerSecond(100);
+  stepper.setAccelerationInStepsPerSecondPerSecond(500);
 }
 
 void loop() {
   long duration, distance;
-  digitalWrite(trigPin, LOW);  // Added this line
-  delayMicroseconds(2); // Added this line
-  digitalWrite(trigPin, HIGH);
-//  delayMicroseconds(1000); - Removed this line
-  delayMicroseconds(10); // Added this line
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-  distance = duration * (0.343/2);
+
+  for( int n = 0; n <= 8; n++ )  
+  {
+    stepper.moveToPositionInSteps(angle);
+    Serial.print("Angle: ");
+    Serial.println(stepper.getCurrentPositionInSteps());
+
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2); 
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
+
+    duration = pulseIn(echoPin, HIGH);
+    distance = duration * (0.343/2);
+
+    Serial.print("Distance: ");
+    if (distance >= 1000 || distance <= 0){
+      Serial.println(outsideRange);
+    }
+    else {
+      Serial.println(distance);
+    }
+
+    delay(500);
+
+    angle = angle + 50;
+  }
+
+  stepper.moveToPositionInSteps(0);
+  Serial.println(stepper.getCurrentPositionInSteps());
+  delay(3000);
+
+  stepper.disableMotor();
+  delay(100000000);
+}
+
+void ledExtra()
+{
+  long distance;
   // distance = (duration/2) / 29.1;
   if (distance < 4) {  // This is where the LED On/Off happens
     digitalWrite(led,HIGH); // When the Red condition is met, the Green LED should turn off
-  digitalWrite(led2,LOW);
-}
+    digitalWrite(led2,LOW);
+  }
   else {
     digitalWrite(led,LOW);
     digitalWrite(led2,HIGH);
-  }
-  if (distance >= 1000 || distance <= 0){
-    Serial.println(outsideRange);
-  }
-  else {
-    Serial.println(distance);
-    // Serial.println(" cm");
   }
   delay(500);
 }
