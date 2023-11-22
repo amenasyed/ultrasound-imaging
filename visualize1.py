@@ -4,8 +4,12 @@ import serial
 
 arduino = serial.Serial("COM7",timeout=1, baudrate=9600)
 
+max_dist = 1000
 image = np.zeros([1, 9])
-image[0, 0] = 1000
+image[0, 8] = 1000
+maxFOV = 512
+xResolution = 8
+rotateStep = (maxFOV*2)/xResolution
 
 # create the figure
 fig = plt.figure()
@@ -24,14 +28,14 @@ while True:
     if "Angle" in serial_output:
         x = serial_output[9:-5]
         x = int(x)
-        x = int((x/64) + 4)
+        x = int((x/rotateStep) + 4)
         print("x:", x)
     if "Distance" in serial_output:
         distance = serial_output[12:-5]
         try:
             distance = float(distance)
         except ValueError:
-            distance = 0.0
+            distance = max_dist
         print("dist:", distance)
     else:
         continue
