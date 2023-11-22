@@ -16,13 +16,29 @@ Some code and wiring inspired by http://en.wikiversity.org/wiki/User:Dstaub/robo
 #define led 11
 #define led2 10
 #define outsideRange 1000
-const int MOTOR_IN1_PIN = 2;
-const int MOTOR_IN2_PIN = 3;
-const int MOTOR_IN3_PIN = 4;
-const int MOTOR_IN4_PIN = 5;
+const int xMOTOR_IN1_PIN = 2;
+const int xMOTOR_IN2_PIN = 3;
+const int xMOTOR_IN3_PIN = 4;
+const int xMOTOR_IN4_PIN = 5;
+const int yMOTOR_IN1_PIN = 6;
+const int yMOTOR_IN2_PIN = 7;
+const int yMOTOR_IN3_PIN = 8;
+const int yMOTOR_IN4_PIN = 9;
 const int STEPS_PER_REVOLUTION = 2048;
-TinyStepper_28BYJ_48 stepper;
-float angle = -256;
+
+TinyStepper_28BYJ_48 xStepper;
+TinyStepper_28BYJ_48 yStepper;
+
+float xMax = 512; // In steps
+float yMaxHeight = 30; // In same units as r
+float r = 2; // In same units as yMaxHeight
+float yMax = (yMaxHeight*2048) / (2*3.14159*r); // y(vert) = 2*pi*r*(steps/2048) // In steps
+
+float xRes = 9;
+float yRes = 9;
+
+float xRotateStepNum = (xMax*2)/(xRes - 1);
+float yRotateStepNum = yMax/(yRes - 1);
 
 
 void setup() {
@@ -33,52 +49,70 @@ void setup() {
   pinMode(led2, OUTPUT);
 
   // connect and configure the stepper motor to its IO pins
-  stepper.connectToPins(MOTOR_IN1_PIN, MOTOR_IN2_PIN, MOTOR_IN3_PIN, MOTOR_IN4_PIN);
+  xStepper.connectToPins(xMOTOR_IN1_PIN, xMOTOR_IN2_PIN, xMOTOR_IN3_PIN, xMOTOR_IN4_PIN);
+  yStepper.connectToPins(yMOTOR_IN1_PIN, yMOTOR_IN2_PIN, yMOTOR_IN3_PIN, yMOTOR_IN4_PIN);
 
-  stepper.setSpeedInStepsPerSecond(100);
-  stepper.setAccelerationInStepsPerSecondPerSecond(500);
+  xStepper.setSpeedInStepsPerSecond(100);
+  xStepper.setAccelerationInStepsPerSecondPerSecond(500);
+
+  yStepper.setSpeedInStepsPerSecond(100);
+  yStepper.setAccelerationInStepsPerSecondPerSecond(500);
 }
 
 void loop() {
-  float dist = senseDistance();
-  Serial.println(dist);
+  // float dist = senseDistance();
+  // Serial.println(dist);
   
-  // delay(2000);
-  // for( int n = 0; n <= 8; n++ )  
-  // {
-  //   stepper.moveToPositionInSteps(angle);
-  //   Serial.print("Angle: ");
-  //   Serial.println(stepper.getCurrentPositionInSteps());
+  delay(2000);
+  float xCurrAngle = xMax;
+  float yCurrAngle = 0;
 
-  //   float dist1 = senseDistance();
-  //   float dist2 = senseDistance();
-  //   float dist3 = senseDistance();
+  for( int m = 0; m < yRes; m++ )
+  {
+    yCurrAngle = m*yRotateStepNum;
+    Serial.print("Y: ");
+    Serial.println(m);
+    yStepper.moveToPositionInSteps(yCurrAngle);
+    delay(100);
+    yStepper.disableMotor();
 
-  //   float dist = (dist1 + dist2 + dist3)/3;
+    for( int n = 0; n < xRes; n++ )  
+    {     
+      Serial.print("X: ");
+      Serial.println(n);
+      xStepper.moveToPositionInSteps(xCurrAngle);
 
-  //   float theta = (angle/1024)*3.14159;
+      float dist1 = senseDistance();
+      float dist2 = senseDistance();
+      float dist3 = senseDistance();
 
-  //   dist = dist*cos(theta);
+      float dist = (dist1 + dist2 + dist3)/3;
 
-  //   Serial.print("Distance: ");
-  //   if (dist >= 1000 || dist <= 0){
-  //     Serial.println(outsideRange);
-  //   }
-  //   else {
-  //     Serial.println(dist);
-  //   }
+      // float theta = (angle/1024)*3.14159;
 
-  //   delay(100);
+      // dist = dist*cos(theta);
 
-  //   angle = angle + 64;
-  // }
+      Serial.print("Z: ");
+      if (dist >= 1000 || dist <= 0){
+        Serial.println("Out of range.");
+      }
+      else {
+        Serial.println(dist);
+      }
 
-  // stepper.moveToPositionInSteps(0);
-  // Serial.println(stepper.getCurrentPositionInSteps());
-  // delay(3000);
-
-  // stepper.disableMotor();
-  // delay(100000000);
+      xCurrAngle = xCurrAngle - xRotateStepNum;
+    }
+    xStepper.disableMotor();
+    xRotateStepNum = - xRotateStepNum;
+    xCurrAngle = xCurrAngle - xRotateStepNum;
+  }
+  delay(500);
+  xStepper.moveToPositionInSteps(0);
+  delay(500);
+  xStepper.disableMotor();
+  yStepper.moveToPositionInSteps(0);
+  yStepper.disableMotor();
+  delay(100000);
 }
 
 float senseDistance()
