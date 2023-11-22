@@ -22,7 +22,7 @@ const int MOTOR_IN3_PIN = 4;
 const int MOTOR_IN4_PIN = 5;
 const int STEPS_PER_REVOLUTION = 2048;
 TinyStepper_28BYJ_48 stepper;
-int angle = -200;
+float angle = -256;
 
 
 void setup() {
@@ -40,42 +40,63 @@ void setup() {
 }
 
 void loop() {
-  long duration, distance;
+  float dist = senseDistance();
+  Serial.println(dist);
+  
+  // delay(2000);
+  // for( int n = 0; n <= 8; n++ )  
+  // {
+  //   stepper.moveToPositionInSteps(angle);
+  //   Serial.print("Angle: ");
+  //   Serial.println(stepper.getCurrentPositionInSteps());
 
-  for( int n = 0; n <= 8; n++ )  
-  {
-    stepper.moveToPositionInSteps(angle);
-    Serial.print("Angle: ");
-    Serial.println(stepper.getCurrentPositionInSteps());
+  //   float dist1 = senseDistance();
+  //   float dist2 = senseDistance();
+  //   float dist3 = senseDistance();
 
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2); 
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
+  //   float dist = (dist1 + dist2 + dist3)/3;
 
-    duration = pulseIn(echoPin, HIGH);
-    distance = duration * (0.343/2);
+  //   float theta = (angle/1024)*3.14159;
 
-    Serial.print("Distance: ");
-    if (distance >= 1000 || distance <= 0){
-      Serial.println(outsideRange);
-    }
-    else {
-      Serial.println(distance);
-    }
+  //   dist = dist*cos(theta);
 
-    delay(500);
+  //   Serial.print("Distance: ");
+  //   if (dist >= 1000 || dist <= 0){
+  //     Serial.println(outsideRange);
+  //   }
+  //   else {
+  //     Serial.println(dist);
+  //   }
 
-    angle = angle + 50;
-  }
+  //   delay(100);
 
-  stepper.moveToPositionInSteps(0);
-  Serial.println(stepper.getCurrentPositionInSteps());
-  delay(3000);
+  //   angle = angle + 64;
+  // }
 
-  stepper.disableMotor();
-  delay(100000000);
+  // stepper.moveToPositionInSteps(0);
+  // Serial.println(stepper.getCurrentPositionInSteps());
+  // delay(3000);
+
+  // stepper.disableMotor();
+  // delay(100000000);
+}
+
+float senseDistance()
+{
+  float duration, distance;
+
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2); 
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * (0.343/2);
+
+  delay(10);
+
+  return distance;
 }
 
 void ledExtra()

@@ -73,7 +73,7 @@ void loop()
   //
 //  stepper.setSpeedInStepsPerSecond(256);
 //  stepper.setAccelerationInStepsPerSecondPerSecond(512);
-  stepper.setupMoveInSteps(32);
+  stepper.setupMoveInSteps(200);
   while(!stepper.motionComplete())
   {
       stepper.processMovement();
