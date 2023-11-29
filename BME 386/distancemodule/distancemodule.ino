@@ -53,11 +53,11 @@ void setup() {
   xStepper.connectToPins(xMOTOR_IN1_PIN, xMOTOR_IN2_PIN, xMOTOR_IN3_PIN, xMOTOR_IN4_PIN);
   yStepper.connectToPins(yMOTOR_IN1_PIN, yMOTOR_IN2_PIN, yMOTOR_IN3_PIN, yMOTOR_IN4_PIN);
 
-  xStepper.setSpeedInStepsPerSecond(400);
-  xStepper.setAccelerationInStepsPerSecondPerSecond(500);
+  xStepper.setSpeedInStepsPerSecond(512);
+  xStepper.setAccelerationInStepsPerSecondPerSecond(512);
 
-  yStepper.setSpeedInStepsPerSecond(450);
-  yStepper.setAccelerationInStepsPerSecondPerSecond(500);
+  yStepper.setSpeedInStepsPerSecond(512);
+  yStepper.setAccelerationInStepsPerSecondPerSecond(512);
 }
 
 void loop() {
@@ -81,7 +81,7 @@ void loop() {
     {     
       Serial.print("X: ");
       Serial.println(n);
-      xStepper.moveToPositionInSteps(xCurrAngle);
+      xStepper.moveToPositionInSteps(-xCurrAngle);
 
       float dist1 = senseDistance();
       float dist2 = senseDistance();
@@ -113,7 +113,8 @@ void loop() {
   xStepper.moveToPositionInSteps(0);
   delay(500);
   xStepper.disableMotor();
-  // yStepper.moveToPositionInSteps(0);
+  delay(5000);
+  yStepper.moveToPositionInSteps(0);
   yStepper.disableMotor();
   delay(1000000000);
 }

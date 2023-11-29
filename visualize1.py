@@ -59,5 +59,7 @@ while y >= 0:
 
     # redraw the figure
     im.set_array(image)
+
+    if y == 0 and x == 0:
+        print(image)
     
-print(image)
