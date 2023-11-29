@@ -30,13 +30,14 @@ TinyStepper_28BYJ_48 xStepper;
 TinyStepper_28BYJ_48 yStepper;
 
 float xMax = 512; // In steps
-float yMaxHeight = 30; // In same units as r
+float yMaxHeight = 40; // In same units as r
 float r = 2; // In same units as yMaxHeight
 float yMax = (yMaxHeight*2048) / (2*3.14159*r); // y(vert) = 2*pi*r*(steps/2048) // In steps
 
-float xRes = 9;
-float yRes = 9;
+float xRes = 17;
+float yRes = 17;
 
+// CCW is positive
 float xRotateStepNum = (xMax*2)/(xRes - 1);
 float yRotateStepNum = yMax/(yRes - 1);
 
@@ -52,10 +53,10 @@ void setup() {
   xStepper.connectToPins(xMOTOR_IN1_PIN, xMOTOR_IN2_PIN, xMOTOR_IN3_PIN, xMOTOR_IN4_PIN);
   yStepper.connectToPins(yMOTOR_IN1_PIN, yMOTOR_IN2_PIN, yMOTOR_IN3_PIN, yMOTOR_IN4_PIN);
 
-  xStepper.setSpeedInStepsPerSecond(100);
+  xStepper.setSpeedInStepsPerSecond(400);
   xStepper.setAccelerationInStepsPerSecondPerSecond(500);
 
-  yStepper.setSpeedInStepsPerSecond(100);
+  yStepper.setSpeedInStepsPerSecond(450);
   yStepper.setAccelerationInStepsPerSecondPerSecond(500);
 }
 
@@ -102,17 +103,19 @@ void loop() {
 
       xCurrAngle = xCurrAngle - xRotateStepNum;
     }
+    xStepper.moveToPositionInSteps(xMax);
     xStepper.disableMotor();
-    xRotateStepNum = - xRotateStepNum;
-    xCurrAngle = xCurrAngle - xRotateStepNum;
+    xCurrAngle = xMax;
+    // xRotateStepNum = - xRotateStepNum;
+    // xCurrAngle = xCurrAngle - xRotateStepNum;
   }
   delay(500);
   xStepper.moveToPositionInSteps(0);
   delay(500);
   xStepper.disableMotor();
-  yStepper.moveToPositionInSteps(0);
+  // yStepper.moveToPositionInSteps(0);
   yStepper.disableMotor();
-  delay(100000);
+  delay(1000000000);
 }
 
 float senseDistance()
