@@ -15,7 +15,7 @@ image[0, xRes-1] = 1000
 # create the figure
 fig = plt.figure()
 ax = fig.add_subplot(111)
-im = ax.imshow(image, cmap='gray', vmin=0, vmax=255)
+im = ax.imshow(image, cmap='gray', vmin=0, vmax=200)
 # Create colorbar
 cbar = ax.figure.colorbar(im, ax=ax)
 cbar.ax.set_ylabel("Distance Scale", rotation=-90, va="bottom")
@@ -39,9 +39,9 @@ while y >= 0:
         x = serial_output[5:-5]
         x = int(x)
         # Flip the order in which the row populates since the scan direction flip-flops.
-        # if y % 2 == 0:
-            # x = (xRes - 1) - x
-        x = (xRes - 1) - x
+        if y % 2 == 0:
+            x = (xRes - 1) - x
+        # x = (xRes - 1) - x
         print("x:", x)
     if "Z" in serial_output:
         distance = serial_output[5:-5]

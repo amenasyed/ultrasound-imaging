@@ -30,7 +30,7 @@ TinyStepper_28BYJ_48 xStepper;
 TinyStepper_28BYJ_48 yStepper;
 
 float xMax = 512; // In steps
-float yMaxHeight = 40; // In same units as r
+float yMaxHeight = 30; // In same units as r
 float r = 2; // In same units as yMaxHeight
 float yMax = (yMaxHeight*2048) / (2*3.14159*r); // y(vert) = 2*pi*r*(steps/2048) // In steps
 
@@ -65,7 +65,7 @@ void loop() {
   // Serial.println(dist);
   
   delay(2000);
-  float xCurrAngle = xMax;
+  float xCurrAngle = -xMax; // Set up to turn CW 90 deg to start scanning.
   float yCurrAngle = 0;
 
   for( int m = 0; m < yRes; m++ )
@@ -81,7 +81,7 @@ void loop() {
     {     
       Serial.print("X: ");
       Serial.println(n);
-      xStepper.moveToPositionInSteps(-xCurrAngle);
+      xStepper.moveToPositionInSteps(xCurrAngle);
 
       float dist1 = senseDistance();
       float dist2 = senseDistance();
@@ -101,13 +101,19 @@ void loop() {
         Serial.println(dist);
       }
 
-      xCurrAngle = xCurrAngle - xRotateStepNum;
+      if( n < (xRes - 1) )
+      {
+        xCurrAngle = xCurrAngle + xRotateStepNum;
+      }
     }
-    xStepper.moveToPositionInSteps(xMax);
+    
+    // For right to left scanning every time
+    // xStepper.disableMotor();
+    // xCurrAngle = -xMax;
+
+    // For alternating right to left and left to right
     xStepper.disableMotor();
-    xCurrAngle = xMax;
-    // xRotateStepNum = - xRotateStepNum;
-    // xCurrAngle = xCurrAngle - xRotateStepNum;
+    xRotateStepNum = - xRotateStepNum;
   }
   delay(500);
   xStepper.moveToPositionInSteps(0);
